@@ -34,6 +34,13 @@ def connect_db():
     return rv
 
 
+# open database connection
+def get_db():
+    if not hasattr(g, "sqlite_db"):
+        g.sqlite_db = connect_db()
+    return g.sqlite_db
+
+
 # create the database
 def init_db():
     with app.app_context():
@@ -43,11 +50,9 @@ def init_db():
         db.commit()
 
 
-# open database connection
-def get_db():
-    if not hasattr(g, "sqlite_db"):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
+# Create the database
+if not os.path.exists(DATABASE):
+    init_db()
 
 
 # close database connection
