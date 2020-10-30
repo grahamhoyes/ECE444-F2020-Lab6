@@ -2,7 +2,7 @@ import pytest
 from pathlib import Path
 import json
 
-from project.app import app, db
+from project.app import app, db, models
 
 TEST_DB = "test.sqlite3"
 
@@ -84,3 +84,16 @@ def test_delete_message(client):
     rv = client.get("/delete/1")
     data = json.loads(rv.data)
     assert data["status"] == 1
+
+
+def test_search_messages(client):
+    """Ensure that the user can search messages"""
+    post1 = models.Post("Post 1", "Hi There")
+    post2 = models.Post("Post 2", "Hello World")
+    db.session.add(post1)
+    db.session.add(post2)
+    db.session.commit()
+
+    rv = client.get("/search/?query=Hi")
+    assert b"Post 1" in rv.data
+    assert b"Post 2" not in rv.data
